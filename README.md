@@ -56,7 +56,8 @@ param:insert_attribute_after("type", param:attribute("name")):set_value("float")
 doc:save_file("tutorial.xml")
 ````
 
-See an imperfect example of dumping an xml file in a less verbose format: https://gist.github.com/3832071
+See an [imperfect example](https://gist.github.com/3832071) of dumping an xml file in a less verbose format,
+or a filter of [vcproj](https://gist.github.com/3832285) or [vcxproj](https://gist.github.com/3832290) source files into lua tables
 
 ### API differences
 
