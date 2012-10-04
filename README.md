@@ -72,6 +72,7 @@ Dependencies
  * [pugixml](https://github.com/zeux/pugixml) the original library
  * [lua](http://www.lua.org/) the language, Lua 5.1.4 from [luaforwindows](http://code.google.com/p/luaforwindows/), but it should work for every proper lua which is supported by LuaBridge
  * [LuaBridge](https://github.com/vinniefalco/LuaBridge) for the declarative bindings to Lua
+ * [premake4](http://industriousone.com/premake) for generating make files
 
 License
 -------
