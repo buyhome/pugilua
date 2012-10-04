@@ -16,6 +16,7 @@ require 'pugilua'
 
 
 ---- reading ----
+local doc=pugi.xml_document()
 local res=doc:load_file [[..\..\scripts\pugilua\pugilua.vcxproj]]
 
 print(res.description)
