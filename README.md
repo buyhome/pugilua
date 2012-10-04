@@ -56,6 +56,8 @@ param:insert_attribute_after("type", param:attribute("name")):set_value("float")
 doc:save_file("tutorial.xml")
 ````
 
+See an imperfect example of dumping an xml file in a less verbose format: https://gist.github.com/3832071
+
 ### API differences
 
  * There's no explicit cast to boolean of the pugilua objects, hence the classes `xml_parse_result, xml_node and xml_document` have a boolean `property` valid
