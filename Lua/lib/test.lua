@@ -34,13 +34,16 @@ end
 
 ----
 node=doc:root():child('Project')
-print(node.text)
+--print(node.string)
 
 ----
 doc:reset()
 --- from the tutorial
 -- add node with some name
 local node = doc:root():append_child("node");
+
+local t=node:append_child("test"):text():set(123)
+print(node.string)
 
 -- add description node with text child
 local descr = node:append_child("description");

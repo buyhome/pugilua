@@ -10,7 +10,7 @@
 namespace pugi {
 	namespace lua {
 
-		static char const* version = "0.1.2";
+		static char const* version = "0.1.3";
 
 		class lxpath_node;
 		class lxpath_node_set;
@@ -52,8 +52,8 @@ namespace pugi {
 			double number() const { return att.as_double(); }
 			bool as_bool() const { return att.as_bool(); }
 
-			void set_name(char const* n) { att.set_name(n); }
-			void set_value(char const* v) { att.set_value(v); }
+			bool set_name(char const* n) { return att.set_name(n); }
+			bool set_value(char const* v) { return att.set_value(v); }
 			
 			RefCountedPtr<lxml_attribute> next_attribute() const {
 				return RefCountedPtr<lxml_attribute>(new lxml_attribute(att.next_attribute()));
@@ -118,6 +118,26 @@ namespace pugi {
 
 		private:
 			pugi::xml_parse_result res;
+		};
+
+
+		///////////////
+		class lxml_text {
+		public:
+			lxml_text(pugi::xml_text const& t):text(t) {}
+			lxml_text() {}
+		
+		public:
+			bool valid() const {
+				return (bool)text;
+			}
+
+			bool set(char const* str) {
+				return text.set(str);
+			}
+
+		private:
+			pugi::xml_text text;
 		};
 
 		///////////////
@@ -201,7 +221,9 @@ namespace pugi {
 				
 			RefCountedPtr<lxpath_node_set> select_nodes(char const* query) const;
 
-			std::string text() const;
+			std::string string() const;
+
+			RefCountedPtr<lxml_text> text() const;
 
 			//todo: text(), xml_tree_walker somehow
 
@@ -506,10 +528,14 @@ namespace pugi {
 			}
 		}
 
-		std::string lxml_node::text() const {
+		std::string lxml_node::string() const {
 			std::stringstream ss;
 			node.print(ss);
 			return ss.str();
+		}
+
+		RefCountedPtr<lxml_text> lxml_node::text() const {
+			return RefCountedPtr<lxml_text>(new lxml_text(node.text()));
 		}
 
 		///////////////////
@@ -643,6 +669,12 @@ void register_pugilua (lua_State* L) {
 		.addStaticProperty("status_file_not_found",&lxml_parse_result::status_file_not_found)
 		.endClass()
 
+		.beginClass<lxml_text>("lxml_text")
+		.addConstructor<void (*)()>()
+		.addProperty("valid",&lxml_text::valid)
+		.addFunction("set",&lxml_text::set)
+		.endClass()
+
 		.beginClass<lxml_node>("xml_node")
 		.addConstructor<void (*)()>()
 		.addProperty("valid",&lxml_node::valid)
@@ -650,7 +682,7 @@ void register_pugilua (lua_State* L) {
 		.addProperty("value",&lxml_node::value)
 		.addProperty("type",&lxml_node::type)
 		.addProperty("path",&lxml_node::path)
-		.addProperty("text",&lxml_node::text)
+		.addProperty("string",&lxml_node::string)
 		.addFunction("child",&lxml_node::child)
 		.addFunction("first_attribute",&lxml_node::first_attribute)
 		.addFunction("last_attribute",&lxml_node::last_attribute)
@@ -695,6 +727,7 @@ void register_pugilua (lua_State* L) {
 		.addFunction("first_element_by_path",&lxml_node::first_element_by_path)
 		.addFunction("select_single_node",&lxml_node::select_single_node)
 		.addFunction("select_nodes",&lxml_node::select_nodes)
+		.addFunction("text",&lxml_node::text)
 		.endClass()
 
 		.beginClass<lxml_document>("xml_document")
