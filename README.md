@@ -66,6 +66,8 @@ or a filter of [vcproj](https://gist.github.com/3832285) or [vcxproj](https://gi
  * lua classes have no inheritance
  * Getter methods are mapped to lua properties and not methods
 
+In-detail API mapping from pugixml to pugilua can be viewed on [google docs](https://docs.google.com/spreadsheet/ccc?key=0AnZVgVA3E-DRdFY5eVp1ZUZHZW9GMzUwY0pfT0VuRVE)
+
 Dependencies
 ------------
 
