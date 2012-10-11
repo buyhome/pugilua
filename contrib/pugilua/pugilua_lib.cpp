@@ -48,6 +48,22 @@ namespace pugi {
 		static int format_default = (int)pugi::format_default;
 
 		////////////////////
+		static int parse_cdata = (int)pugi::parse_cdata;
+		static int parse_comments = (int)pugi::parse_comments;
+		static int parse_declaration = (int)pugi::parse_declaration;
+		static int parse_default = (int)pugi::parse_default;
+		static int parse_doctype = (int)pugi::parse_doctype;
+		static int parse_eol = (int)pugi::parse_eol;
+		static int parse_escapes = (int)pugi::parse_escapes;
+		static int parse_full = (int)pugi::parse_full;
+		static int parse_minimal = (int)pugi::parse_minimal;
+		static int parse_pi = (int)pugi::parse_pi;
+		static int parse_ws_pcdata = (int)pugi::parse_ws_pcdata;
+		static int parse_ws_pcdata_single = (int)pugi::parse_ws_pcdata_single;
+		static int parse_wconv_attribute = (int)pugi::parse_wconv_attribute;
+		static int parse_wnorm_attribute = (int)pugi::parse_wnorm_attribute;
+
+		////////////////////
 		static int node_null = (int)pugi::node_null;		
 		static int node_document = (int)pugi::node_document;	
 		static int node_element = (int)pugi::node_element;	
@@ -654,6 +670,22 @@ void register_pugilua (lua_State* L) {
 		.addVariable("format_no_escapes",&format_no_escapes,false)	
 		.addVariable("format_save_file_text",&format_save_file_text,false)
 		.addVariable("format_default",&format_default,false)
+
+		.addVariable("parse_cdata",&parse_cdata,false)
+		.addVariable("parse_comments",&parse_comments,false)
+		.addVariable("parse_declaration",&parse_declaration,false)
+		.addVariable("parse_default",&parse_default,false)
+		.addVariable("parse_doctype",&parse_doctype,false)
+		.addVariable("parse_eol",&parse_eol,false)
+		.addVariable("parse_escapes",&parse_escapes,false)
+		.addVariable("parse_full",&parse_full,false)
+		.addVariable("parse_minimal",&parse_minimal,false)
+		.addVariable("parse_pi",&parse_pi,false)
+		.addVariable("parse_ws_pcdata",&parse_ws_pcdata,false)
+		.addVariable("parse_ws_pcdata_single",&parse_ws_pcdata_single,false)
+		.addVariable("parse_wconv_attribute",&parse_wconv_attribute,false)
+		.addVariable("parse_wnorm_attribute",&parse_wnorm_attribute,false)
+
 
 		.addVariable("node_null",&node_null,false)		
 		.addVariable("node_document",&node_document,false)	
