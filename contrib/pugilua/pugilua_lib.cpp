@@ -10,7 +10,18 @@
 namespace pugi {
 	namespace lua {
 
-		static char const* version = "0.1.3";
+		static char const* version = "0.1.4";
+
+		class options {
+		public:
+			options& with(int o) { options_|=o; return *this; }
+			options& without(int o) { options_&=~o; return *this; }
+			int get() const { return options_; }
+			options(int o):options_(o){}
+		private:
+			int options_;
+		};
+
 
 		class lxpath_node;
 		class lxpath_node_set;
@@ -608,6 +619,13 @@ void register_pugilua (lua_State* L) {
 		.beginNamespace("pugi")
 
 		.addVariable("version",&version,false)
+
+		.beginClass<options>("options")
+		.addConstructor<void (*)(int)>()
+		.addProperty("int",&options::get)
+		.addFunction("with",&options::with)
+		.addFunction("without",&options::without)
+		.endClass()
 
 		.addVariable("encoding_auto",&encoding_auto,false)
 		.addVariable("encoding_utf8",&encoding_utf8,false)	
