@@ -669,7 +669,7 @@ void register_pugilua (lua_State* L) {
 		.addStaticProperty("status_file_not_found",&lxml_parse_result::status_file_not_found)
 		.endClass()
 
-		.beginClass<lxml_text>("lxml_text")
+		.beginClass<lxml_text>("xml_text")
 		.addConstructor<void (*)()>()
 		.addProperty("valid",&lxml_text::valid)
 		.addFunction("set",&lxml_text::set)
