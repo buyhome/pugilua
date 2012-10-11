@@ -39,6 +39,15 @@ namespace pugi {
 		static int encoding_latin1 = (int)pugi::encoding_latin1;
 
 		////////////////////
+		static int format_indent = (int)pugi::format_indent;
+		static int format_write_bom = (int)pugi::format_write_bom;	
+		static int format_raw = (int)pugi::format_raw;
+		static int format_no_declaration = (int)pugi::format_no_declaration;
+		static int format_no_escapes = (int)pugi::format_no_escapes;	
+		static int format_save_file_text = (int)pugi::format_save_file_text;
+		static int format_default = (int)pugi::format_default;
+
+		////////////////////
 		static int node_null = (int)pugi::node_null;		
 		static int node_document = (int)pugi::node_document;	
 		static int node_element = (int)pugi::node_element;	
@@ -637,6 +646,14 @@ void register_pugilua (lua_State* L) {
 		.addVariable("encoding_utf32",&encoding_utf32,false)	
 		.addVariable("encoding_wchar",&encoding_wchar,false)	
 		.addVariable("encoding_latin1",&encoding_latin1,false)
+
+		.addVariable("format_indent",&format_indent,false)
+		.addVariable("format_write_bom",&format_write_bom,false)	
+		.addVariable("format_raw",&format_raw,false)
+		.addVariable("format_no_declaration",&format_no_declaration,false)
+		.addVariable("format_no_escapes",&format_no_escapes,false)	
+		.addVariable("format_save_file_text",&format_save_file_text,false)
+		.addVariable("format_default",&format_default,false)
 
 		.addVariable("node_null",&node_null,false)		
 		.addVariable("node_document",&node_document,false)	
