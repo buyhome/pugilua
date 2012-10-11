@@ -39,6 +39,13 @@ namespace pugi {
 		static int encoding_latin1 = (int)pugi::encoding_latin1;
 
 		////////////////////
+		static int xpath_type_none = (int)pugi::xpath_type_none;
+		static int xpath_type_node_set = (int)pugi::xpath_type_node_set;
+		static int xpath_type_number = (int)pugi::xpath_type_number;
+		static int xpath_type_string = (int)pugi::xpath_type_string;
+		static int xpath_type_boolean = (int)pugi::xpath_type_boolean;
+
+		////////////////////
 		static int format_indent = (int)pugi::format_indent;
 		static int format_write_bom = (int)pugi::format_write_bom;	
 		static int format_raw = (int)pugi::format_raw;
@@ -662,6 +669,11 @@ void register_pugilua (lua_State* L) {
 		.addVariable("encoding_utf32",&encoding_utf32,false)	
 		.addVariable("encoding_wchar",&encoding_wchar,false)	
 		.addVariable("encoding_latin1",&encoding_latin1,false)
+
+		.addVariable("xpath_type_none",&xpath_type_none,false)
+		.addVariable("xpath_type_node_set",&xpath_type_node_set,false)
+		.addVariable("xpath_type_number",&xpath_type_number,false)
+		.addVariable("xpath_type_string",&xpath_type_string,false)
 
 		.addVariable("format_indent",&format_indent,false)
 		.addVariable("format_write_bom",&format_write_bom,false)	
