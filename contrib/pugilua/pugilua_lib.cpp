@@ -114,6 +114,8 @@ namespace pugi {
 
 			bool set_name(char const* n) { return att.set_name(n); }
 			bool set_value(char const* v) { return att.set_value(v); }
+
+			bool same_as(lxml_attribute const& other) const { return other.att==att; }
 			
 			RefCountedPtr<lxml_attribute> next_attribute() const {
 				return RefCountedPtr<lxml_attribute>(new lxml_attribute(att.next_attribute()));
@@ -173,6 +175,10 @@ namespace pugi {
 		public:
 			bool valid() const {
 				return (bool)text;
+			}
+
+			bool empty() const {
+				return text.empty();
 			}
 
 			bool set(char const* str) {
@@ -266,7 +272,15 @@ namespace pugi {
 
 			std::string string() const;
 
+			std::string as_string_with_options(char const* indent, int flags, int encoding, int depth) const;
+
 			RefCountedPtr<lxml_text> text() const;
+
+			bool same_as(lxml_node const& other) const;
+
+			ptrdiff_t offset_debug() const;
+
+			size_t hash_value() const;
 
 			//todo: text(), xml_tree_walker somehow
 
@@ -285,10 +299,14 @@ namespace pugi {
 			bool valid() const;
 
 			void reset();
+			void reset_with(lxml_document const* other);
 
 			RefCountedPtr<lxml_parse_result> load_file(char const* path);
+			RefCountedPtr<lxml_parse_result> load_file_with_options(char const* path,int options, int encoding);
 			RefCountedPtr<lxml_parse_result> load(char const* contents);
+			RefCountedPtr<lxml_parse_result> load_with_options(char const* contents,int options);
 			bool save_file(char const* path) const;
+			bool save_file_with_options(char const* path,char const* indent,int flags,int encoding) const;
 
 		private:
 			pugi::xml_document doc;
@@ -577,8 +595,26 @@ namespace pugi {
 			return ss.str();
 		}
 
+		std::string lxml_node::as_string_with_options(char const* indent, int flags, int encoding, int depth) const {
+			std::stringstream ss;
+			node.print(ss,indent,(unsigned int)flags,(pugi::xml_encoding)encoding,(unsigned int)depth);
+			return ss.str();
+		}
+
 		RefCountedPtr<lxml_text> lxml_node::text() const {
 			return RefCountedPtr<lxml_text>(new lxml_text(node.text()));
+		}
+
+		bool lxml_node::same_as(lxml_node const& other) const {
+			return other.node==node;
+		}
+
+		size_t lxml_node::hash_value() const {
+			return node.hash_value();
+		}
+
+		ptrdiff_t lxml_node::offset_debug() const {
+			return node.offset_debug();
 		}
 
 		///////////////////
@@ -598,8 +634,27 @@ namespace pugi {
 			doc.reset();
 		}
 
+		void lxml_document::reset_with(lxml_document const* other) {
+			doc.reset(other->doc);
+		}
+
 		RefCountedPtr<lxml_parse_result> lxml_document::load(char const* contents) {
 			return RefCountedPtr<lxml_parse_result>(new lxml_parse_result(doc.load(contents)));
+		}
+
+		RefCountedPtr<lxml_parse_result> lxml_document::load_with_options(char const* contents,int options)
+		{
+			return RefCountedPtr<lxml_parse_result>(new lxml_parse_result(doc.load(contents,(unsigned int)options)));
+		}
+
+		RefCountedPtr<lxml_parse_result> lxml_document::load_file_with_options(char const* path,int options, int encoding)
+		{
+			return RefCountedPtr<lxml_parse_result>(new lxml_parse_result(doc.load_file(path,(unsigned int)options,(pugi::xml_encoding)encoding)));
+		}
+
+		bool lxml_document::save_file_with_options(char const* path,char const* indent,int flags,int encoding) const
+		{
+			return doc.save_file(path,indent,(unsigned int)flags,(pugi::xml_encoding)encoding);
 		}
 
 		bool lxml_document::save_file(char const* path) const {
@@ -738,6 +793,7 @@ void register_pugilua (lua_State* L) {
 		.addFunction("set_value",&lxml_attribute::set_value)
 		.addFunction("next_attribute",&lxml_attribute::next_attribute)
 		.addFunction("previous_attribute",&lxml_attribute::previous_attribute)
+		.addFunction("same_as",&lxml_attribute::same_as)
 		.endClass()
 
 		.beginClass<lxml_parse_result>("xml_parse_result")
@@ -752,6 +808,7 @@ void register_pugilua (lua_State* L) {
 		.beginClass<lxml_text>("xml_text")
 		.addConstructor<void (*)()>()
 		.addProperty("valid",&lxml_text::valid)
+		.addProperty("empty",&lxml_text::empty)
 		.addFunction("set",&lxml_text::set)
 		.endClass()
 
@@ -763,6 +820,8 @@ void register_pugilua (lua_State* L) {
 		.addProperty("type",&lxml_node::type)
 		.addProperty("path",&lxml_node::path)
 		.addProperty("string",&lxml_node::string)
+		.addProperty("hash_value",&lxml_node::hash_value)
+		.addProperty("offset_debug",&lxml_node::offset_debug)
 		.addFunction("child",&lxml_node::child)
 		.addFunction("first_attribute",&lxml_node::first_attribute)
 		.addFunction("last_attribute",&lxml_node::last_attribute)
@@ -808,6 +867,8 @@ void register_pugilua (lua_State* L) {
 		.addFunction("select_single_node",&lxml_node::select_single_node)
 		.addFunction("select_nodes",&lxml_node::select_nodes)
 		.addFunction("text",&lxml_node::text)
+		.addFunction("same_as",&lxml_node::same_as)
+		.addFunction("as_string_with_options",&lxml_node::as_string_with_options)
 		.endClass()
 
 		.beginClass<lxml_document>("xml_document")
@@ -815,9 +876,13 @@ void register_pugilua (lua_State* L) {
 		.addProperty("valid",&lxml_document::valid)
 		.addFunction("root",&lxml_document::root)
 		.addFunction("reset",&lxml_document::reset)
+		.addFunction("reset_with",&lxml_document::reset_with)
 		.addFunction("load_file",&lxml_document::load_file)
+		.addFunction("load_file_with_options",&lxml_document::load_file_with_options)
 		.addFunction("load",&lxml_document::load)
+		.addFunction("load_with_options",&lxml_document::load_with_options)
 		.addFunction("save_file",&lxml_document::save_file)
+		.addFunction("save_file_with_options",&lxml_document::save_file_with_options)
 		.endClass()
 
 		.beginClass<lxpath_node>("xpath_node")
