@@ -39,6 +39,23 @@ namespace pugi {
 		static int encoding_latin1 = (int)pugi::encoding_latin1;
 
 		////////////////////
+		static int status_ok = (int)pugi::status_ok;
+		static int status_file_not_found = (int)pugi::status_file_not_found;
+		static int status_io_error = (int)pugi::status_io_error;
+		static int status_out_of_memory = (int)pugi::status_out_of_memory;
+		static int status_internal_error = (int)pugi::status_internal_error;
+		static int status_unrecognized_tag = (int)pugi::status_unrecognized_tag;
+		static int status_bad_pi = (int)pugi::status_bad_pi;
+		static int status_bad_comment = (int)pugi::status_bad_comment;
+		static int status_bad_cdata = (int)pugi::status_bad_cdata;
+		static int status_bad_doctype = (int)pugi::status_bad_doctype;
+		static int status_bad_pcdata = (int)pugi::status_bad_pcdata;
+		static int status_bad_start_element = (int)pugi::status_bad_start_element;
+		static int status_bad_attribute = (int)pugi::status_bad_attribute;
+		static int status_bad_end_element = (int)pugi::status_bad_end_element;
+		static int status_end_element_mismatch  = (int)pugi::status_end_element_mismatch ;
+
+		////////////////////
 		static int xpath_type_none = (int)pugi::xpath_type_none;
 		static int xpath_type_node_set = (int)pugi::xpath_type_node_set;
 		static int xpath_type_number = (int)pugi::xpath_type_number;
@@ -141,23 +158,6 @@ namespace pugi {
 			ptrdiff_t offset() const {
 				return res.offset;
 			}
-
-		public:
-			static int status_ok() { return pugi::status_ok; }
-			static int status_file_not_found() { return pugi::status_file_not_found; }		
-			static int status_io_error() { return pugi::status_io_error; }			
-			static int status_out_of_memory() { return pugi::status_out_of_memory; }		
-			static int status_internal_error() { return pugi::status_internal_error; }		
-			static int status_unrecognized_tag() { return pugi::status_unrecognized_tag; }
-			static int status_bad_pi() { return pugi::status_bad_pi; }
-			static int status_bad_comment() { return pugi::status_bad_comment; }		
-			static int status_bad_cdata() { return pugi::status_bad_cdata; }			
-			static int status_bad_doctype() { return pugi::status_bad_doctype; }		
-			static int status_bad_pcdata() { return pugi::status_bad_pcdata; }		
-			static int status_bad_start_element() { return pugi::status_bad_start_element; }	
-			static int status_bad_attribute() { return pugi::status_bad_attribute; }		
-			static int status_bad_end_element() { return pugi::status_bad_end_element; }		
-			static int status_end_element_mismatch() { return pugi::status_end_element_mismatch; }
 
 		private:
 			pugi::xml_parse_result res;
@@ -683,6 +683,22 @@ void register_pugilua (lua_State* L) {
 		.addVariable("format_save_file_text",&format_save_file_text,false)
 		.addVariable("format_default",&format_default,false)
 
+		.addVariable("status_ok",&status_ok,false)
+		.addVariable("status_file_not_found",&status_file_not_found,false)
+		.addVariable("status_io_error",&status_io_error,false)
+		.addVariable("status_out_of_memory",&status_out_of_memory,false)
+		.addVariable("status_internal_error",&status_internal_error,false)
+		.addVariable("status_unrecognized_tag",&status_unrecognized_tag,false)
+		.addVariable("status_bad_pi",&status_bad_pi,false)
+		.addVariable("status_bad_comment",&status_bad_comment,false)
+		.addVariable("status_bad_cdata",&status_bad_cdata,false)
+		.addVariable("status_bad_doctype",&status_bad_doctype,false)
+		.addVariable("status_bad_pcdata",&status_bad_pcdata,false)
+		.addVariable("status_bad_start_element",&status_bad_start_element,false)
+		.addVariable("status_bad_attribute",&status_bad_attribute,false)
+		.addVariable("status_bad_end_element",&status_bad_end_element,false)
+		.addVariable("status_end_element_mismatch ",&status_end_element_mismatch ,false)
+
 		.addVariable("parse_cdata",&parse_cdata,false)
 		.addVariable("parse_comments",&parse_comments,false)
 		.addVariable("parse_declaration",&parse_declaration,false)
@@ -731,21 +747,6 @@ void register_pugilua (lua_State* L) {
 		.addProperty("status",&lxml_parse_result::status)
 		.addProperty("encoding",&lxml_parse_result::encoding)
 		.addProperty("offset",&lxml_parse_result::offset)
-		.addStaticProperty("status_ok",&lxml_parse_result::status_ok)
-		.addStaticProperty("status_io_error",&lxml_parse_result::status_io_error)	
-		.addStaticProperty("status_out_of_memory",&lxml_parse_result::status_out_of_memory)		
-		.addStaticProperty("status_internal_error",&lxml_parse_result::status_internal_error)		
-		.addStaticProperty("status_unrecognized_tag",&lxml_parse_result::status_unrecognized_tag)	
-		.addStaticProperty("status_bad_pi",&lxml_parse_result::status_bad_pi)				
-		.addStaticProperty("status_bad_comment",&lxml_parse_result::status_bad_comment)			
-		.addStaticProperty("status_bad_cdata",&lxml_parse_result::status_bad_cdata)			
-		.addStaticProperty("status_bad_doctype",&lxml_parse_result::status_bad_doctype)			
-		.addStaticProperty("status_bad_pcdata",&lxml_parse_result::status_bad_pcdata)			
-		.addStaticProperty("status_bad_start_element",&lxml_parse_result::status_bad_start_element)	
-		.addStaticProperty("status_bad_attribute",&lxml_parse_result::status_bad_attribute)		
-		.addStaticProperty("status_bad_end_element",&lxml_parse_result::status_bad_end_element)		
-		.addStaticProperty("status_end_element_mismatch",&lxml_parse_result::status_end_element_mismatch)
-		.addStaticProperty("status_file_not_found",&lxml_parse_result::status_file_not_found)
 		.endClass()
 
 		.beginClass<lxml_text>("xml_text")
