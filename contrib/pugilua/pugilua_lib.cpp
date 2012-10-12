@@ -25,6 +25,7 @@ namespace pugi {
 
 		class lxpath_node;
 		class lxpath_node_set;
+		class lxml_node;
 
 		////////////////////
 		static int encoding_auto = (int)pugi::encoding_auto;
@@ -185,6 +186,24 @@ namespace pugi {
 				return text.set(str);
 			}
 
+			std::string string() const {
+				return text.get();
+			}
+
+			double number() const {
+				return text.as_double();
+			}
+
+			bool as_bool() const {
+				return text.as_bool();
+			}
+
+			bool same_as(lxml_text const& other) const {
+				return other.text==text;
+			}
+
+			RefCountedPtr<lxml_node> data() const;
+
 		private:
 			pugi::xml_text text;
 		};
@@ -322,6 +341,10 @@ namespace pugi {
 
 			RefCountedPtr<lxml_node> node() const;
 			RefCountedPtr<lxml_attribute> attribute() const;
+			void from_node(RefCountedPtr<lxml_node> other);
+			void from_attribute(RefCountedPtr<lxml_attribute>,RefCountedPtr<lxml_node> other);
+			RefCountedPtr<lxml_node> parent() const;
+			bool same_as(RefCountedPtr<lxpath_node> other) const;
 
 		private:
 			pugi::xpath_node _node;
@@ -342,6 +365,10 @@ namespace pugi {
 			RefCountedPtr<lxpath_node> get(size_t i);
 
 			void sort(bool reverse);
+
+			bool empty() const;
+
+			RefCountedPtr<lxpath_node> first() const;
 
 		public:
 			// enums
@@ -618,6 +645,11 @@ namespace pugi {
 		}
 
 		///////////////////
+		RefCountedPtr<lxml_node> lxml_text::data() const {
+			return RefCountedPtr<lxml_node>(new lxml_node(text.data()));
+		}
+
+		///////////////////
 		RefCountedPtr<lxml_parse_result> lxml_document::load_file(char const* path) {
 			return RefCountedPtr<lxml_parse_result>(new lxml_parse_result(doc.load_file(path)));
 		}
@@ -677,6 +709,21 @@ namespace pugi {
 			return RefCountedPtr<lxml_attribute>(new lxml_attribute(_node.attribute()));
 		}
 
+		void lxpath_node::from_node(RefCountedPtr<lxml_node> other) {
+			_node=other->get();
+		}
+
+		void lxpath_node::from_attribute(RefCountedPtr<lxml_attribute> a,RefCountedPtr<lxml_node> other) {
+			_node=pugi::xpath_node(a->get(),other->get());
+		}
+
+		RefCountedPtr<lxml_node> lxpath_node::parent() const {
+			return RefCountedPtr<lxml_node>(new lxml_node(_node.parent()));
+		}
+
+		bool lxpath_node::same_as(RefCountedPtr<lxpath_node> other) const {
+			return other->_node==_node;
+		}
 
 		/////////////////////
 		lxpath_node_set::lxpath_node_set(pugi::xpath_node_set const& s):node_set(s) { }
@@ -696,6 +743,14 @@ namespace pugi {
 
 		void lxpath_node_set::sort(bool reverse) {
 			node_set.sort(reverse);
+		}
+
+		bool lxpath_node_set::empty() const {
+			return node_set.empty();
+		}
+
+		RefCountedPtr<lxpath_node> lxpath_node_set::first() const {
+			return RefCountedPtr<lxpath_node>(new lxpath_node(node_set.first()));
 		}
 	}
 }
@@ -808,8 +863,13 @@ void register_pugilua (lua_State* L) {
 		.beginClass<lxml_text>("xml_text")
 		.addConstructor<void (*)()>()
 		.addProperty("valid",&lxml_text::valid)
+		.addProperty("string",&lxml_text::string)
+		.addProperty("number",&lxml_text::number)
+		.addProperty("bool",&lxml_text::as_bool)
 		.addProperty("empty",&lxml_text::empty)
 		.addFunction("set",&lxml_text::set)
+		.addFunction("same_as",&lxml_text::same_as)
+		.addFunction("data",&lxml_text::data)
 		.endClass()
 
 		.beginClass<lxml_node>("xml_node")
@@ -890,17 +950,23 @@ void register_pugilua (lua_State* L) {
 		.addProperty("valid",&lxpath_node::valid)
 		.addFunction("node",&lxpath_node::node)
 		.addFunction("attribute",&lxpath_node::attribute)
+		.addFunction("from_node",&lxpath_node::from_node)
+		.addFunction("from_attribute",&lxpath_node::from_attribute)
+		.addFunction("parent",&lxpath_node::parent)
+		.addFunction("same_as",&lxpath_node::same_as)
 		.endClass()
 
 		.beginClass<lxpath_node_set>("xpath_node_set")
 		.addConstructor<void (*)()>()
 		.addProperty("type",&lxpath_node_set::type)
 		.addProperty("size",&lxpath_node_set::size)
+		.addProperty("empty",&lxpath_node_set::empty)
 		.addStaticProperty("type_unsorted",&lxpath_node_set::type_unsorted)
 		.addStaticProperty("type_sorted",&lxpath_node_set::type_sorted)
 		.addStaticProperty("type_sorted_reverse",&lxpath_node_set::type_sorted_reverse)
 		.addFunction("get",&lxpath_node_set::get)
 		.addFunction("sort",&lxpath_node_set::sort)
+		.addFunction("first",&lxpath_node_set::first)
 		.endClass()
 
 		.endNamespace()
