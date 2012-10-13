@@ -412,39 +412,84 @@ namespace pugi {
 		class lxpath_variable {
 		public:
 			std::string name() const {
-				return var.name();
+				if (var)
+					return var->name();
+				else
+					return "";
 			}
 
 			int type() const {
-				return (int)var.type();
+				if (var)
+					return (int)var->type();
+				else
+					return pugi::xpath_type_none;
 			}
 
 			bool get_boolean() const {
-				return var.get_boolean();
+				if (var)
+					return var->get_boolean();
+				else
+					return false;
 			}
 
 			double number() const {
-				return var.get_number();
+				if (var)
+					return var->get_number();
+				else
+					return 0;
 			}
 
 			std::string get_string() const {
-				return var.get_string();
+				if (var)
+					return var->get_string();
+				else
+					return "";
 			}
 
 			RefCountedPtr<lxpath_node_set> get_node_set() const {
-				return RefCountedPtr<lxpath_node_set>(new lxpath_node_set(var.get_node_set()));
+				if (var)
+					return RefCountedPtr<lxpath_node_set>(new lxpath_node_set(var->get_node_set()));
+				else
+					return RefCountedPtr<lxpath_node_set>(new lxpath_node_set(pugi::xpath_node_set()));
 			}
 
 			bool set(char const* val) {
-				var.set(val);
+				if (var)
+					return var->set(val);
+				else
+					return false;
 			}
 
 			bool set_node_set(RefCountedPtr<lxpath_node_set> s) {
-				var.set(s.get());
+				if (var) 
+					return var->set(s.get());
+				else
+					return false;
+			}
+
+			bool valid() const {
+				return (bool)var;
+			}
+
+		public: //non-interface
+
+			void set_var(pugi::xpath_variable* v) {
+				var=v;
 			}
 
 		private:
-			pugi::xpath_variable var;
+			pugi::xpath_variable* var;
+		};
+
+		/////////////////////////
+		class lxpath_variable_set {
+		public:
+			RefCountedPtr<lxpath_variable> add(char const* name,int type) {
+				return RefCountedPtr<lxpath_variable>();
+			}
+				
+		private:
+			pugi::xpath_variable_set set_;
 		};
 
 	}
@@ -1048,6 +1093,14 @@ void register_pugilua (lua_State* L) {
 		.beginClass<lxpath_variable>("xpath_variable")
 		.addConstructor<void (*)()>()
 		.addProperty("name",&lxpath_variable::name)
+		.addProperty("type",&lxpath_variable::type)
+		.addProperty("bool",&lxpath_variable::get_boolean)
+		.addProperty("number",&lxpath_variable::number)
+		.addProperty("string",&lxpath_variable::get_string)
+		.addProperty("valid",&lxpath_variable::valid)
+		.addFunction("get_node_set",&lxpath_variable::get_node_set)
+		.addFunction("set",&lxpath_variable::set)
+		.addFunction("set_node_set",&lxpath_variable::set_node_set)
 		.endClass()
 
 		.endNamespace()
