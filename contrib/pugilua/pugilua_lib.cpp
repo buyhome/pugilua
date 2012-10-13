@@ -1220,6 +1220,18 @@ void register_pugilua (lua_State* L) {
 		.addFunction("get",&lxpath_variable_set::get)
 		.endClass()
 
+		.beginClass<lxpath_query>("xpath_query")
+		.addStaticFunction("from_string",&lxpath_query::from_string)
+		.addStaticFunction("with_variables",&lxpath_query::with_variables)
+		.addProperty("valid",&lxpath_query::valid)
+		.addProperty("return_type",&lxpath_query::return_type)
+		.addFunction("evaluate_boolean",&lxpath_query::evaluate_boolean)
+		.addFunction("evaluate_number",&lxpath_query::evaluate_number)
+		.addFunction("evaluate_string",&lxpath_query::evaluate_string)
+		.addFunction("evaluate_node_set",&lxpath_query::evaluate_node_set)
+		.addFunction("result",&lxpath_query::result)
+		.endClass()
+
 		.endNamespace()
 		;
 }
