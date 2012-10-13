@@ -408,6 +408,45 @@ namespace pugi {
 			pugi::xpath_node_set node_set;
 		};
 
+		////////////////////
+		class lxpath_variable {
+		public:
+			std::string name() const {
+				return var.name();
+			}
+
+			int type() const {
+				return (int)var.type();
+			}
+
+			bool get_boolean() const {
+				return var.get_boolean();
+			}
+
+			double number() const {
+				return var.get_number();
+			}
+
+			std::string get_string() const {
+				return var.get_string();
+			}
+
+			RefCountedPtr<lxpath_node_set> get_node_set() const {
+				return RefCountedPtr<lxpath_node_set>(new lxpath_node_set(var.get_node_set()));
+			}
+
+			bool set(char const* val) {
+				var.set(val);
+			}
+
+			bool set_node_set(RefCountedPtr<lxpath_node_set> s) {
+				var.set(s.get());
+			}
+
+		private:
+			pugi::xpath_variable var;
+		};
+
 	}
 }
 
@@ -1004,6 +1043,11 @@ void register_pugilua (lua_State* L) {
 		.addFunction("get",&lxpath_node_set::get)
 		.addFunction("sort",&lxpath_node_set::sort)
 		.addFunction("first",&lxpath_node_set::first)
+		.endClass()
+
+		.beginClass<lxpath_variable>("xpath_variable")
+		.addConstructor<void (*)()>()
+		.addProperty("name",&lxpath_variable::name)
 		.endClass()
 
 		.endNamespace()
