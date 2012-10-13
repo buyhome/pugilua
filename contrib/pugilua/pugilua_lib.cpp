@@ -1,5 +1,6 @@
 #include "pugilua_lib.h"
 
+#define PUGIXML_NO_EXCEPTIONS
 #include <pugixml.hpp>
 #include <LuaBridge.h>
 #include <RefCountedPtr.h>
@@ -375,6 +376,11 @@ namespace pugi {
 			RefCountedPtr<lxml_node> parent() const;
 			bool same_as(RefCountedPtr<lxpath_node> other) const;
 
+		public: //non-interface
+			pugi::xpath_node const& get() {
+				return _node;
+			}
+
 		private:
 			pugi::xpath_node _node;
 		};
@@ -543,6 +549,57 @@ namespace pugi {
 			pugi::xpath_variable_set* set_;
 		};
 
+		//////////////////
+		class lxpath_query {
+		public:
+			explicit lxpath_query(char const* s):q(s) {}
+			explicit lxpath_query(char const* s,RefCountedPtr<lxpath_variable_set> v):q(s,v->get_set()) {}
+
+		public: //static constructors
+			static RefCountedPtr<lxpath_query> from_string(char const* s);
+			static RefCountedPtr<lxpath_query> with_variables(char const* s,RefCountedPtr<lxpath_variable_set> v);
+
+		public:
+			bool evaluate_boolean(RefCountedPtr<lxpath_node> n) const {
+				return q.evaluate_boolean(n->get());
+			}
+
+			double evaluate_number(RefCountedPtr<lxpath_node> n) const {
+				return q.evaluate_number(n->get());
+			}
+
+			std::string evaluate_string(RefCountedPtr<lxpath_node> n) const {
+				return q.evaluate_string(n->get());
+			}
+
+			RefCountedPtr<lxpath_node_set> evaluate_node_set(RefCountedPtr<lxpath_node> n) const {
+				return RefCountedPtr<lxpath_node_set>(new lxpath_node_set(q.evaluate_node_set(n->get())));
+			}
+
+			int return_type() const {
+				return (int)q.return_type();
+			}
+
+			RefCountedPtr<lxpath_parse_result> result() const {
+				return RefCountedPtr<lxpath_parse_result>(new lxpath_parse_result(q.result()));
+			}
+
+			bool valid() const {
+				return (bool)q;
+			}
+
+		private:
+			pugi::xpath_query q;
+		};
+
+		////////////////////////////////////////////////////////////////////
+		RefCountedPtr<lxpath_query> lxpath_query::from_string(char const* s) {
+			return RefCountedPtr<lxpath_query>(new lxpath_query(s));
+		}
+
+		RefCountedPtr<lxpath_query> lxpath_query::with_variables(char const* s,RefCountedPtr<lxpath_variable_set> v) {
+			return RefCountedPtr<lxpath_query>(new lxpath_query(s,v));
+		}
 	}
 }
 
@@ -589,7 +646,7 @@ namespace pugi {
 		RefCountedPtr<lxpath_node_set> lxml_node::select_nodes(char const* query) const {
 			try {
 				return RefCountedPtr<lxpath_node_set>(new lxpath_node_set(node.select_nodes(query)));
-			} catch (pugi::xpath_exception const& e) {
+			} catch (std::exception const& e) {
 				std::cerr<<"Error: "<<e.what()<<std::endl;
 				return RefCountedPtr<lxpath_node_set>(new lxpath_node_set());
 			}
@@ -774,7 +831,7 @@ namespace pugi {
 		RefCountedPtr<lxpath_node> lxml_node::select_single_node(char const* query) const {
 			try {
 				return RefCountedPtr<lxpath_node>(new lxpath_node(node.select_single_node(query)));
-			} catch (pugi::xpath_exception const& e) {
+			} catch (std::exception const& e) {
 				std::cerr<<"Error: "<<e.what()<<std::endl;
 				return RefCountedPtr<lxpath_node>(new lxpath_node());
 			}
