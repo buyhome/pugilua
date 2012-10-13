@@ -10,7 +10,7 @@
 namespace pugi {
 	namespace lua {
 
-		static char const* version = "0.1.4";
+		static char const* version = "0.1.5";
 
 		class options {
 		public:
@@ -329,6 +329,35 @@ namespace pugi {
 
 		private:
 			pugi::xml_document doc;
+		};
+
+		////////////////////////
+		class lxpath_parse_result {
+		public:
+			lxpath_parse_result(pugi::xpath_parse_result const& r) {
+				res=r;
+			}
+			lxpath_parse_result() {}
+		
+		public:
+			std::string error() const {
+				return res.error;
+			}
+
+			ptrdiff_t offset() const {
+				return res.offset;
+			}
+
+			bool valid() const {
+				return (bool)res;
+			}
+
+			std::string description() const {
+				return res.description();
+			}
+			
+		private:
+			pugi::xpath_parse_result res;
 		};
 
 		/////////////////
@@ -943,6 +972,14 @@ void register_pugilua (lua_State* L) {
 		.addFunction("load_with_options",&lxml_document::load_with_options)
 		.addFunction("save_file",&lxml_document::save_file)
 		.addFunction("save_file_with_options",&lxml_document::save_file_with_options)
+		.endClass()
+
+		.beginClass<lxpath_parse_result>("xpath_parse_result")
+		.addConstructor<void (*)()>()
+		.addProperty("error",&lxpath_parse_result::error)
+		.addProperty("offset",&lxpath_parse_result::offset)
+		.addProperty("description",&lxpath_parse_result::description)
+		.addProperty("valid",&lxpath_parse_result::valid)
 		.endClass()
 
 		.beginClass<lxpath_node>("xpath_node")
