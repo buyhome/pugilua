@@ -27,6 +27,8 @@ namespace pugi {
 		class lxpath_node;
 		class lxpath_node_set;
 		class lxml_node;
+		class lxpath_variable_set;
+		class lxpath_query;
 
 		////////////////////
 		static int encoding_auto = (int)pugi::encoding_auto;
@@ -287,8 +289,16 @@ namespace pugi {
 			RefCountedPtr<lxml_node> first_element_by_path(const char* path) const;
 
 			RefCountedPtr<lxpath_node> select_single_node(const char* query) const;
+
+			RefCountedPtr<lxpath_node> select_single_node_with_variables(const char* query,RefCountedPtr<lxpath_variable_set> variables) const;
+
+			RefCountedPtr<lxpath_node> select_single_node_query(RefCountedPtr<lxpath_query> query) const;
 				
 			RefCountedPtr<lxpath_node_set> select_nodes(char const* query) const;
+
+			RefCountedPtr<lxpath_node_set> select_nodes_with_variables(char const* query,RefCountedPtr<lxpath_variable_set> variables) const;
+
+			RefCountedPtr<lxpath_node_set> select_nodes_query(RefCountedPtr<lxpath_query> query) const;
 
 			std::string string() const;
 
@@ -588,6 +598,11 @@ namespace pugi {
 				return (bool)q;
 			}
 
+		public:
+			pugi::xpath_query const& get() {
+				return q;
+			}
+
 		private:
 			pugi::xpath_query q;
 		};
@@ -646,6 +661,24 @@ namespace pugi {
 		RefCountedPtr<lxpath_node_set> lxml_node::select_nodes(char const* query) const {
 			try {
 				return RefCountedPtr<lxpath_node_set>(new lxpath_node_set(node.select_nodes(query)));
+			} catch (std::exception const& e) {
+				std::cerr<<"Error: "<<e.what()<<std::endl;
+				return RefCountedPtr<lxpath_node_set>(new lxpath_node_set());
+			}
+		}
+
+		RefCountedPtr<lxpath_node_set> lxml_node::select_nodes_with_variables(char const* query,RefCountedPtr<lxpath_variable_set> variables) const {
+			try {
+				return RefCountedPtr<lxpath_node_set>(new lxpath_node_set(node.select_nodes(query,variables->get_set())));
+			} catch (std::exception const& e) {
+				std::cerr<<"Error: "<<e.what()<<std::endl;
+				return RefCountedPtr<lxpath_node_set>(new lxpath_node_set());
+			}
+		}
+
+		RefCountedPtr<lxpath_node_set> lxml_node::select_nodes_query(RefCountedPtr<lxpath_query> query) const {
+			try {
+				return RefCountedPtr<lxpath_node_set>(new lxpath_node_set(node.select_nodes(query->get())));
 			} catch (std::exception const& e) {
 				std::cerr<<"Error: "<<e.what()<<std::endl;
 				return RefCountedPtr<lxpath_node_set>(new lxpath_node_set());
@@ -831,6 +864,24 @@ namespace pugi {
 		RefCountedPtr<lxpath_node> lxml_node::select_single_node(char const* query) const {
 			try {
 				return RefCountedPtr<lxpath_node>(new lxpath_node(node.select_single_node(query)));
+			} catch (std::exception const& e) {
+				std::cerr<<"Error: "<<e.what()<<std::endl;
+				return RefCountedPtr<lxpath_node>(new lxpath_node());
+			}
+		}
+
+		RefCountedPtr<lxpath_node> lxml_node::select_single_node_with_variables(const char* query,RefCountedPtr<lxpath_variable_set> variables) const {
+			try {
+				return RefCountedPtr<lxpath_node>(new lxpath_node(node.select_single_node(query,variables->get_set())));
+			} catch (std::exception const& e) {
+				std::cerr<<"Error: "<<e.what()<<std::endl;
+				return RefCountedPtr<lxpath_node>(new lxpath_node());
+			}
+		}
+
+		RefCountedPtr<lxpath_node> lxml_node::select_single_node_query(RefCountedPtr<lxpath_query> query) const {
+			try {
+				return RefCountedPtr<lxpath_node>(new lxpath_node(node.select_single_node(query->get())));
 			} catch (std::exception const& e) {
 				std::cerr<<"Error: "<<e.what()<<std::endl;
 				return RefCountedPtr<lxpath_node>(new lxpath_node());
@@ -1146,7 +1197,11 @@ void register_pugilua (lua_State* L) {
 		.addFunction("find_child_by_attribute",&lxml_node::find_child_by_attribute)
 		.addFunction("first_element_by_path",&lxml_node::first_element_by_path)
 		.addFunction("select_single_node",&lxml_node::select_single_node)
+		.addFunction("select_single_node_with_variables",&lxml_node::select_single_node_with_variables)
+		.addFunction("select_single_node_query",&lxml_node::select_single_node_query)
 		.addFunction("select_nodes",&lxml_node::select_nodes)
+		.addFunction("select_nodes_with_variables",&lxml_node::select_nodes_with_variables)
+		.addFunction("select_nodes_query",&lxml_node::select_nodes_query)
 		.addFunction("text",&lxml_node::text)
 		.addFunction("same_as",&lxml_node::same_as)
 		.addFunction("as_string_with_options",&lxml_node::as_string_with_options)
