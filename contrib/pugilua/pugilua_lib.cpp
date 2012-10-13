@@ -404,12 +404,21 @@ namespace pugi {
 			static int type_unsorted () { return pugi::xpath_node_set::type_unsorted; }
 			static int type_sorted () { return pugi::xpath_node_set::type_sorted; }
 			static int type_sorted_reverse () { return pugi::xpath_node_set::type_sorted_reverse; }
+
+		public: //non-interface
+			pugi::xpath_node_set const& get_node_set() const {
+				return node_set;
+			}
+
 		private:
 			pugi::xpath_node_set node_set;
 		};
 
 		////////////////////
 		class lxpath_variable {
+		public:
+			lxpath_variable():var(0){}
+
 		public:
 			std::string name() const {
 				if (var)
@@ -484,12 +493,54 @@ namespace pugi {
 		/////////////////////////
 		class lxpath_variable_set {
 		public:
+			lxpath_variable_set():set_(0) {}
+		public:
 			RefCountedPtr<lxpath_variable> add(char const* name,int type) {
-				return RefCountedPtr<lxpath_variable>();
+				RefCountedPtr<lxpath_variable> res(new lxpath_variable);
+				if (set_) {
+					res->set_var(set_->add(name,(pugi::xpath_value_type)type));
+				}
+				return res;
+			}
+
+			bool set(char const* name,char const* value) {
+				if (set_)
+					return set_->set(name,value);
+				else
+					return false;
+			}
+
+			bool set_node_set(char const* name,RefCountedPtr<lxpath_node_set> value) {
+				if (set_)
+					return set_->set(name,value->get_node_set());
+				else
+					return false;
+			}
+
+			RefCountedPtr<lxpath_variable> get(char const* name) {
+				RefCountedPtr<lxpath_variable> res(new lxpath_variable);
+				if (set_) {
+					res->set_var(set_->get(name));
+				}
+				return res;
+			}
+
+		public:
+			bool valid() const {
+				return (bool)set_;
+			}
+
+		public: //non-interface
+			void set_set(pugi::xpath_variable_set* s) {
+				set_=s;
+			}
+
+			pugi::xpath_variable_set* get_set() {
+				return set_;
 			}
 				
 		private:
-			pugi::xpath_variable_set set_;
+			pugi::xpath_variable_set* set_;
 		};
 
 	}
@@ -1101,6 +1152,15 @@ void register_pugilua (lua_State* L) {
 		.addFunction("get_node_set",&lxpath_variable::get_node_set)
 		.addFunction("set",&lxpath_variable::set)
 		.addFunction("set_node_set",&lxpath_variable::set_node_set)
+		.endClass()
+
+		.beginClass<lxpath_variable_set>("xpath_variable_set")
+		.addConstructor<void (*)()>()
+		.addProperty("valid",&lxpath_variable_set::valid)
+		.addFunction("add",&lxpath_variable_set::add)
+		.addFunction("set",&lxpath_variable_set::set)
+		.addFunction("set_node_set",&lxpath_variable_set::set_node_set)
+		.addFunction("get",&lxpath_variable_set::get)
 		.endClass()
 
 		.endNamespace()
