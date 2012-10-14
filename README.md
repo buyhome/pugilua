@@ -68,6 +68,11 @@ or a filter of [vcproj](https://gist.github.com/3832285) or [vcxproj](https://gi
 
 In-detail API mapping from pugixml to pugilua can be viewed on [google docs](https://docs.google.com/spreadsheet/ccc?key=0AnZVgVA3E-DRdFY5eVp1ZUZHZW9GMzUwY0pfT0VuRVE)
 
+### Building
+
+Two versions of build scripts exist at the moment: the Visual Studio 2010 solution in the ./scripts/pugilua folder, which outputs to the ./Lua/lib folder to be able to try out the library immediately,
+and a premake4 script and a couple of batch files in the same directory, which creates a new directory Build. Make sure, the right lua version is avaliable globally, especially if you have installed a lua package on linux.
+
 Dependencies
 ------------
 
