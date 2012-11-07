@@ -11,7 +11,7 @@ lua directly and use the library by calling `require 'pugilua'`. Follow the test
 pugi 'namespace' in Lua.
 
 Example of usage:
-````
+````lua
 require 'pugilua'
 
 
